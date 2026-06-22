@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZKP & Merkle Tree Privacy Protocols Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styleheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <div class="logo-text">
+                    <h1>Cryptography & Privacy Protocols</h1>
+                    <p>University Academic Assignment Implementation</p>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <span class="pulse-dot"></span>
+                <span>Active Sandbox - Localhost</span>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-grid">
+            
+            <!-- PART 1: ZKP Foundations -->
+            <section class="card zkp-section">
+                <div class="card-header">
+                    <h2><span class="part-badge">Part 1</span> ZKP PIN Commitment</h2>
+                    <p class="subtitle">Proving knowledge of a 4-digit PIN without revealing it</p>
+                </div>
+                
+                <div class="card-body">
+                    <!-- PIN Setup -->
+                    <div class="control-group">
+                        <label for="pin-input">Configure Target PIN (4 Digits)</label>
+                        <div class="input-row">
+                            <input type="password" id="pin-input" value="1234" maxlength="4" placeholder="Enter 4-digit PIN">
+                            <button id="set-pin-btn" class="btn btn-secondary">
+                                <i class="fa-solid fa-key"></i> Set PIN
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Simulator Controls -->
+                    <div class="simulation-controls">
+                        <button id="simulate-honest-btn" class="btn btn-primary">
+                            <i class="fa-solid fa-user-shield"></i> Run Honest Prover (100 Iterations)
+                        </button>
+                        <button id="simulate-cheat-btn" class="btn btn-danger">
+                            <i class="fa-solid fa-mask"></i> Run Cheating Prover (100 Iterations)
+                        </button>
+                    </div>
+
+                    <!-- ZKP Stat Dashboard -->
+                    <div id="zkp-stats" class="stats-display hidden">
+                        <div class="stat-box">
+                            <span class="stat-label">Total Rounds</span>
+                            <span class="stat-value" id="stat-rounds">100</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Success Rate</span>
+                            <span class="stat-value" id="stat-rate">0%</span>
+                        </div>
+                        <div class="stat-box span-2">
+                            <span class="stat-label">Cheater Success Probability (100 Rounds)</span>
+                            <span class="stat-value font-mono text-small" id="stat-probability">7.88 × 10⁻³¹</span>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Iterations table -->
+                    <div id="zkp-details" class="details-section hidden">
+                        <h3>Detailed Audit Trail (First 10 Rounds)</h3>
+                        <div class="table-container">
+                            <table class="audit-table">
+                                <thead>
+                                    <tr>
+                                        <th>Round</th>
+                                        <th>Commitment C₀ / C₁</th>
+                                        <th>Challenge</th>
+                                        <th>Revealed Value (Salt)</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="zkp-audit-body">
+                                    <!-- Populated dynamically by app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Theoretical ZKP Explanation -->
+                    <div class="explanation-box">
+                        <h3><i class="fa-solid fa-circle-info"></i> Why is this Zero-Knowledge?</h3>
+                        <p>
+                            In each round, the Prover generates a random masking key $r$ (a one-time pad) and commits to $H(r)$ and $H(PIN \oplus r)$. 
+                            When challenged with <strong>0</strong>, the Prover reveals $r$. When challenged with <strong>1</strong>, the Prover reveals $PIN \oplus r$.
+                        </p>
+                        <p class="highlight-text">
+                            <strong>What the Verifier Learns:</strong> The Verifier only learns either $r$ or $PIN \oplus r$ (both of which look completely random). Since the Verifier never obtains both values in a single round, the secret PIN is never exposed, yielding <strong>Zero-Knowledge</strong>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART 2: Merkle Trees & Anonymity Sets -->
+            <section class="card merkle-section">
+                <div class="card-header">
+                    <h2><span class="part-badge">Part 2</span> Merkle Tree Anonymity Set</h2>
+                    <p class="subtitle">Simplified deposit/withdrawal anonymity system</p>
+                </div>
+
+                <div class="card-body">
+                    <!-- Deposit Input -->
+                    <div class="control-group">
+                        <label for="coin-input">Deposit Unique "Coin" String</label>
+                        <div class="input-row">
+                            <input type="text" id="coin-input" placeholder="e.g. coin_alice_987">
+                            <button id="deposit-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-circle-dollar-to-slot"></i> Deposit
+                            </button>
+                            <button id="reset-tree-btn" class="btn btn-secondary" title="Reset Tree">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Merkle Root Display -->
+                    <div class="root-display">
+                        <span class="root-label"><i class="fa-solid fa-code-fork"></i> Merkle Root:</span>
+                        <span id="merkle-root-value" class="root-value">Initializing...</span>
+                    </div>
+
+                    <!-- Deposits Table -->
+                    <div class="deposits-container">
+                        <h3>Active Anonymity Set (10 Leaves Needed)</h3>
+                        <div class="leaf-grid" id="leaf-grid-display">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                        <div class="anonymity-set-counter">
+                            Anonymity Set Size: <strong id="anon-set-size">0</strong> / 10 Deposits
+                        </div>
+                    </div>
+
+                    <!-- Proof Generation & Verification Section -->
+                    <div class="proof-section">
+                        <h3>Generate & Verify Membership Proof</h3>
+                        <div class="proof-controls">
+                            <select id="leaf-select" class="select-dropdown">
+                                <option value="" disabled selected>Select a leaf to prove...</option>
+                            </select>
+                            <button id="prove-btn" class="btn btn-secondary" disabled>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Proof
+                            </button>
+                        </div>
+
+                        <!-- Proof Output -->
+                        <div id="proof-result" class="proof-result hidden">
+                            <div class="proof-panel">
+                                <h4>Merkle Membership Proof Path:</h4>
+                                <div class="proof-path-list" id="proof-path-display">
+                                    <!-- Populated dynamically by app.js -->
+                                </div>
+                            </div>
+
+                            <!-- Verify Proof Trigger -->
+                            <div class="verify-action-box">
+                                <button id="verify-proof-btn" class="btn btn-success">
+                                    <i class="fa-solid fa-circle-check"></i> Verify Proof Without Index
+                                </button>
+                                <div id="verification-status" class="verification-badge hidden">
+                                    Verified!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theoretical Merkle Explanation -->
+                    <div class="explanation-box">
+                        <h3><i class="fa-solid fa-circle-info"></i> Merkle Privacy Mechanics</h3>
+                        <p>
+                            A smart contract stores deposited coins as leaves in a Merkle Tree. When withdrawing, a user provides a <strong>Merkle Path</strong>.
+                        </p>
+                        <p class="highlight-text">
+                            <strong>Anonymity Analysis:</strong> Since the verifier function <code>verifyProof(leaf, proof, root)</code> only processes the leaf value and sibling hashes to confirm root equality, it proves membership <strong>without revealing the index of the leaf</strong>. Thus, the transaction remains unlinkable within the anonymity set!
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>ZKP PIN Verification & Merkle Tree Cryptographic Assignment &copy; 2026. Implementation built with Python (Flask) and Vanilla CSS/JS.</p>
+        </footer>
+    </div>
+
+    <!-- App Javascript logic -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
